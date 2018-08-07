@@ -20,7 +20,6 @@ def main(queries):
             test = stext[i:j]
             if searchlen==2:
                 if not((hcname in test) or ("{{" in test) or ("}}" in test) or (test == "")):
-                    #print(searchlen, stext, name, end = " ")
                     stext = stext[:i]+stext[i:].replace(hname, hcname, 1)
                     shift+=1
                     ef+=1
@@ -30,7 +29,6 @@ def main(queries):
     for query in queries:
         title = query["title"]
         pageid = query["pageid"]
-        titlefilename = "linterrors/"+title.replace("/", "-s-")
         if pageid in pageids: print("skipped"); continue
         else: pageids.append(pageid)
         page = p.Page(site, title)
@@ -47,18 +45,9 @@ def main(queries):
             newtext, shift, ef = fix(newtext, name, loc, shift)
             if ef == 0:
                 allerrorsfixed = False
-        def savecall(page, outcome):
-            if not outcome:
-                raise(outcome)
-            else:
-                with open("linterrors/editsmade", "r") as editfile: editsmade = editfile.read()
-                with open("linterrors/editsmade", "w") as editfile: editfile.write(str(int(editsmade)+1))
-        if True:#allerrorsfixed:
+        if allerrorsfixed:
             print(allerrorsfixed, title)
-            #DO NOT UNCOMMENT page.save(newtext, summary = "[[User:Galobot#Task_1|Task 1]]: Fix [[Special:LintErrors|lint errors]] ([[Special:LintErrors/multiple-unclosed-formatting-tags|multiple unclosed formatting tags]])", minor = True) #edit page
-            with open(titlefilename, "w") as textfile: textfile.write(newtext)
-            #sys.exit()
-            #site.throttle.wait(8)
-queries = p.data.api.ListGenerator("linterrors", lntcategories = "multiple-unclosed-formatting-tags", lntfrom = 70366479, lntlimit = sys.argv[1], site = site)
+            page.save(newtext, summary = "[[User:Galobot#Task_1|Task 1]]: Fix [[Special:LintErrors|lint errors]] ([[Special:LintErrors/multiple-unclosed-formatting-tags|multiple unclosed formatting tags]])", minor = True) #edit page
+queries = p.data.api.ListGenerator("linterrors", lntcategories = "multiple-unclosed-formatting-tags", lntlimit = sys.argv[1], site = site)
 queries.set_maximum_items(sys.argv[2])
 main(queries)
