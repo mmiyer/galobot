@@ -22,8 +22,8 @@ def main(queries):
                 if not((hcname in test) or ("{{" in test) or ("}}" in test) or (test == "")):
                     #print(searchlen, stext, name, end = " ")
                     if name == "tt" and not "|" in test:
-                        stext = stext.replace(hname, "{{mono|", 1)
-                        stext = stext.replace(hname, "}}", 1)
+                        stext = stext.replace(hname, "{{mono|1=", 1)
+                        stext = stext.replace(hname, "|needs_review=yes}}", 1)
                         shift+=1
                     elif name == "strike":
                         stext = stext.replace(hname, "<s>", 1)
