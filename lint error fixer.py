@@ -33,7 +33,6 @@ def main(queries):
                         stext = stext[:i]+stext[i:].replace(hname, hcname, 1)
                         shift+=1
                     ef+=1
-                    print(stext)
         text = text[:loc[0]]+stext+text[loc[1]:]
         return text, shift, ef
     pageids = []
@@ -56,7 +55,7 @@ def main(queries):
             name = error["params"]["name"]
             newtext, shift, ef = fix(newtext, name, loc, shift)
             if ef == 0:
-                allerrorsfixed = False
+                allerrorsfixed = False #ef = errorsfixed, if unable to fix a particular error, all errors haven't been fixed
         if allerrorsfixed:
             print(title)
             #page.save(newtext, summary = "[[User:Galobot#Task_1|Task 1]]: Fix [[Special:LintErrors|lint errors]] ([[Special:LintErrors/multiple-unclosed-formatting-tags|multiple unclosed formatting tags]])", minor = True) #edit page
