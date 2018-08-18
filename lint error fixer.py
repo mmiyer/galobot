@@ -21,7 +21,7 @@ def main(queries):
             if searchlen==2:
                 if not((hcname in test) or ("{{" in test) or ("}}" in test) or (test == "")):
                     #print(searchlen, stext, name, end = " ")
-                    if name == "tt" and not "|" in test:
+                    if name == "tt" and test=="reviewer":
                         stext = stext.replace(hname, "{{mono|", 1)
                         stext = stext.replace(hname, "}}", 1)
                         shift+=1
@@ -33,6 +33,7 @@ def main(queries):
                         stext = stext[:i]+stext[i:].replace(hname, hcname, 1)
                         shift+=1
                     ef+=1
+                    print(stext)
         text = text[:loc[0]]+stext+text[loc[1]:]
         return text, shift, ef
     pageids = []
@@ -56,8 +57,8 @@ def main(queries):
             newtext, shift, ef = fix(newtext, name, loc, shift)
             if ef == 0:
                 allerrorsfixed = False
-        if True:#allerrorsfixed:
-            print(allerrorsfixed, title)
+        if allerrorsfixed:
+            print(title)
             #page.save(newtext, summary = "[[User:Galobot#Task_1|Task 1]]: Fix [[Special:LintErrors|lint errors]] ([[Special:LintErrors/multiple-unclosed-formatting-tags|multiple unclosed formatting tags]])", minor = True) #edit page
             with open(titlefilename, "w") as textfile: textfile.write(newtext)
 queries = p.data.api.ListGenerator("linterrors", lntcategories = "multiple-unclosed-formatting-tags", lntfrom = 70406479, lntlimit = sys.argv[1], site = site)
