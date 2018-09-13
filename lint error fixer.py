@@ -35,21 +35,31 @@ def main(queries):
                     ef+=1
         text = text[:loc[0]]+stext+text[loc[1]:]
         return text, shift, ef
+    global pageids
     pageids = []
+    count = 0
     for query in queries:
+        if count == 8:
+            break
         title = query["title"]
         pageid = query["pageid"]
-        titlefilename = "linterrors/"+title.replace("/", "-s-")
-        if pageid in pageids: print("skipped"); continue
+        name = query["params"]["name"]
+        if name in ("font", "small", "big"):
+            #print("foo")
+            continue
+        #titlefilename = "linterrors/"+title.replace("/", "-s-")
+        if pageid in pageids: continue
         else: pageids.append(pageid)
+        if ("/" not in title) and title.startswith("User talk:"): print("nooo", title); continue
+        errors = p.data.api.ListGenerator("linterrors", lntcategories = "multiple-unclosed-formatting-tags", lntpageid = pageid, site = site)
         page = p.Page(site, title)
         text = page.text
-        errors = p.data.api.ListGenerator("linterrors", lntcategories = "multiple-unclosed-formatting-tags", lntpageid = pageid, site = site)
         shift = 0
         newtext = text
         allerrorsfixed = True
         for error in errors:
             loc = error["location"]
+            loc[0]-=1
             loc[0]+=shift #everytime a fix is applied, the location is off because a / is added or other changes occur, so add shift
             loc[1]+=shift
             name = error["params"]["name"]
@@ -57,9 +67,15 @@ def main(queries):
             if ef == 0:
                 allerrorsfixed = False #ef = errorsfixed, if unable to fix a particular error, all errors haven't been fixed
         if allerrorsfixed:
-            print(title)
-            #page.save(newtext, summary = "[[User:Galobot#Task_1|Task 1]]: Fix [[Special:LintErrors|lint errors]] ([[Special:LintErrors/multiple-unclosed-formatting-tags|multiple unclosed formatting tags]])", minor = True) #edit page
-            with open(titlefilename, "w") as textfile: textfile.write(newtext)
-queries = p.data.api.ListGenerator("linterrors", lntcategories = "multiple-unclosed-formatting-tags", lntfrom = 70406479, lntlimit = sys.argv[1], site = site)
+            count +=1
+            print(title, count)
+            page.text = newtext
+            try:page.save(summary = "[[User:Galobot#Task_1|Task 1]]: Fix [[Special:LintErrors|lint errors]] ([[Special:LintErrors/multiple-unclosed-formatting-tags|multiple unclosed formatting tags]])", minor = True) #edit page
+            except p.exceptions.PageSaveRelatedError:
+                print("Error")
+            #with open(titlefilename, "w") as textfile: textfile.write(newtext)
+queries = p.data.api.ListGenerator("linterrors", lntcategories = "multiple-unclosed-formatting-tags", lntfrom = 70696479, lntlimit = sys.argv[1], site = site)
 queries.set_maximum_items(sys.argv[2])
-main(queries)
+try: main(queries)
+except KeyboardInterrupt:
+    print("interrupted")
