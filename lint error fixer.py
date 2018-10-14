@@ -1,5 +1,6 @@
 import sys
 import re
+import time
 import pywikibot as p
 
 site = p.Site()
@@ -45,12 +46,9 @@ def main(queries):
         pageid = query["pageid"]
         name = query["params"]["name"]
         if name in ("font", "small", "big"):
-            #print("foo")
             continue
-        #titlefilename = "linterrors/"+title.replace("/", "-s-")
         if pageid in pageids: continue
         else: pageids.append(pageid)
-        if ("/" not in title) and title.startswith("User talk:"): print("nooo", title); continue
         errors = p.data.api.ListGenerator("linterrors", lntcategories = "multiple-unclosed-formatting-tags", lntpageid = pageid, site = site)
         page = p.Page(site, title)
         text = page.text
@@ -59,6 +57,7 @@ def main(queries):
         allerrorsfixed = True
         for error in errors:
             loc = error["location"]
+            lintId = error["lintId"]
             loc[0]-=1
             loc[0]+=shift #everytime a fix is applied, the location is off because a / is added or other changes occur, so add shift
             loc[1]+=shift
@@ -66,16 +65,34 @@ def main(queries):
             newtext, shift, ef = fix(newtext, name, loc, shift)
             if ef == 0:
                 allerrorsfixed = False #ef = errorsfixed, if unable to fix a particular error, all errors haven't been fixed
+                break
+        ids.write("\n"+str(lintId))
         if allerrorsfixed:
             count +=1
             print(title, count)
             page.text = newtext
-            try:page.save(summary = "[[User:Galobot#Task_1|Task 1]]: Fix [[Special:LintErrors|lint errors]] ([[Special:LintErrors/multiple-unclosed-formatting-tags|multiple unclosed formatting tags]])", minor = True) #edit page
+            try:
+                if p.Page(site, "User:Galobot/shutoff").text != "":
+                    print("Bot shutoffed")
+                    while 1:
+                        time.sleep(60)
+                        print("Checking shutoff...")
+                        if p.Page(site, "User:Galobot/shutoff").text == "":
+                            print("No longer shutoffed")
+                            break
+                page.save(summary = "[[User:Galobot#Task_1|Task 1]]: Fix [[Special:LintErrors|lint errors]] ([[Special:LintErrors/multiple-unclosed-formatting-tags|multiple unclosed formatting tags]])", minor = True) #edit page
             except p.exceptions.PageSaveRelatedError:
                 print("Error")
-            #with open(titlefilename, "w") as textfile: textfile.write(newtext)
-queries = p.data.api.ListGenerator("linterrors", lntcategories = "multiple-unclosed-formatting-tags", lntfrom = 70696479, lntlimit = sys.argv[1], site = site)
-queries.set_maximum_items(sys.argv[2])
-try: main(queries)
+
+try:
+    for x in range (int(sys.argv[2])):
+        with open("idsfile.txt", "r") as ids:
+            idlist = ids.readlines()
+            lastid = int(idlist[-1])+1
+            print(lastid)
+        queries = p.data.api.ListGenerator("linterrors", lntcategories = "multiple-unclosed-formatting-tags", lntfrom = lastid, lntlimit = sys.argv[1], site = site)
+        queries.set_maximum_items(sys.argv[1])
+        with open("idsfile.txt", "a+") as ids:
+                main(queries)
 except KeyboardInterrupt:
     print("interrupted")
