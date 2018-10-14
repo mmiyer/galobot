@@ -35,9 +35,7 @@ def main(queries):
                     ef+=1
         text = text[:loc[0]]+stext+text[loc[1]:]
         return text, shift, ef
-    global pageids
     pageids = []
-    count = 0
     for query in queries:
         title = query["title"]
         pageid = query["pageid"]
@@ -52,9 +50,15 @@ def main(queries):
         shift = 0
         newtext = text
         allerrorsfixed = True
+        lintId = 0
+        first = True
         for error in errors:
             loc = error["location"]
-            lintId = error["lintId"]
+            if first == True:
+                tlintId = str(error["lintId"])
+                print(tlintId)
+                if tlintId[1] == "7": lintId = tlintId
+                first = False
             loc[0]-=1
             loc[0]+=shift #everytime a fix is applied, the location is off because a / is added or other changes occur, so add shift
             loc[1]+=shift
@@ -63,10 +67,8 @@ def main(queries):
             if ef == 0:
                 allerrorsfixed = False #ef = errorsfixed, if unable to fix a particular error, all errors haven't been fixed
                 break
-        ids.write("\n"+str(lintId))
+        if lintId !=0: ids.write("\n"+str(lintId))
         if allerrorsfixed:
-            count +=1
-            print(title, count)
             page.text = newtext
             try:
                 if p.Page(site, "User:Galobot/shutoff").text != "":
@@ -85,6 +87,7 @@ def main(queries):
 
 try:
     for x in range (int(sys.argv[2])):
+        print("Starting new cycle")
         with open("idsfile.txt", "r") as ids:
             idlist = ids.readlines()
             lastid = int(idlist[-1])+1
