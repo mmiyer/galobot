@@ -57,7 +57,7 @@ def main(queries):
             if first == True:
                 tlintId = str(error["lintId"])
                 print(tlintId)
-                if tlintId[1] == "7": lintId = tlintId
+                if tlintId[0] == "7": lintId = tlintId
                 first = False
             loc[0]-=1
             loc[0]+=shift #everytime a fix is applied, the location is off because a / is added or other changes occur, so add shift
