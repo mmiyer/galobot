@@ -21,7 +21,6 @@ def main(queries):
             test = stext[i:j]
             if searchlen==2:
                 if not((hcname in test) or ("{{" in test) or ("}}" in test) or (test == "")):
-                    #print(searchlen, stext, name, end = " ")
                     if name == "tt" and test=="reviewer":
                         stext = stext.replace(hname, "{{mono|", 1)
                         stext = stext.replace(hname, "}}", 1)
@@ -40,8 +39,6 @@ def main(queries):
     pageids = []
     count = 0
     for query in queries:
-        if count == 8:
-            break
         title = query["title"]
         pageid = query["pageid"]
         name = query["params"]["name"]
@@ -83,6 +80,8 @@ def main(queries):
                 page.save(summary = "[[User:Galobot#Task_1|Task 1]]: Fix [[Special:LintErrors|lint errors]] ([[Special:LintErrors/multiple-unclosed-formatting-tags|multiple unclosed formatting tags]])", minor = True) #edit page
             except p.exceptions.PageSaveRelatedError:
                 print("Error")
+                with open("errorsfile.txt", "a+") as errorsfile:
+                    errorsfile.write("\n"+str(lintId))
 
 try:
     for x in range (int(sys.argv[2])):
