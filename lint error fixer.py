@@ -44,7 +44,7 @@ def main(queries):
             continue
         if pageid in pageids: continue
         else: pageids.append(pageid)
-        errors = p.data.api.ListGenerator("linterrors", lntcategories = "multiple-unclosed-formatting-tags", lntpageid = pageid, site = site)
+        errors = p.data.api.ListGenerator("linterrors", lntcategories = "multiple-unclosed-formatting-tags", lntlimit = 500, lntpageid = pageid, site = site)
         page = p.Page(site, title)
         text = page.text
         shift = 0
@@ -55,9 +55,8 @@ def main(queries):
         for error in errors:
             loc = error["location"]
             if first == True:
-                tlintId = str(error["lintId"])
-                print(tlintId)
-                if tlintId[0] == "7": lintId = tlintId
+                lintId = str(error["lintId"])
+                print(lintId)
                 first = False
             loc[0]-=1
             loc[0]+=shift #everytime a fix is applied, the location is off because a / is added or other changes occur, so add shift
@@ -90,7 +89,7 @@ try:
         print("Starting new cycle")
         with open("idsfile.txt", "r") as ids:
             idlist = ids.readlines()
-            lastid = int(idlist[-1])+1
+            lastid = int(idlist[-2])
             print(lastid)
         queries = p.data.api.ListGenerator("linterrors", lntcategories = "multiple-unclosed-formatting-tags", lntfrom = lastid, lntlimit = sys.argv[1], site = site)
         queries.set_maximum_items(sys.argv[1])
