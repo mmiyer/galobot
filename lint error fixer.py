@@ -82,7 +82,7 @@ def main(queries):
             except p.exceptions.PageSaveRelatedError:
                 print("Error")
                 with open("errorsfile.txt", "a+") as errorsfile:
-                    errorsfile.write("\n"+str(title, pageid, lintId))
+                    errorsfile.write("\n"+str(title) + " " + str(pageid) + " " + str(lintId))
 
 try:
     for x in range (int(sys.argv[2])):
