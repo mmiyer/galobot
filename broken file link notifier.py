@@ -108,6 +108,6 @@ for username in users:
             difflist = [('\n* ' + x) for x in difflist]
         diffs = ''.join(difflist)
         print('Messaging', username, '...')
-        print('Hello. Thank you for your recent edits. An automated process has found that you have added ', 'the non-existent files:' if multiple else 'a non-existent file ', diffs,  '.' if not multiple else '', '\nYou may remove this message. To stop receiving these messages, see the opt-out instructions. ~~~~', sep = '')
+        print('Hello. Thank you for your recent edits. An automated process has found that you have added ', 'the non-existent files:' if multiple else 'a non-existent file ', diffs,  '.' if not multiple else '\n', 'If you can, please remove or fix the file link. You may remove this message. To stop receiving these messages, see the opt-out instructions. ~~~~', sep = '')
 #TODO:be more efficient when user makes multiple consecutive edits
-#TODO:deal with first page creations with broken links nicely, currently will think that the pattern is [1] not [0,1] and so won't send message
+#TODO:deal with first page creations with broken links nicely
