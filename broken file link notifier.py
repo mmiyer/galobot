@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import shelve
 import os
 import datetime
