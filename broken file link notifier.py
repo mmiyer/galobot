@@ -21,7 +21,7 @@ with shelve.open('current run.shelve') as current,  shelve.open('previous run.sh
         imageexist = p.data.api.Request(parameters = {'action' : 'query', 'titles' : imagesjoined, 'format' : 'json', 'formatversion' : '2'}, site = site).submit()
         brokenimages = set()
         for x in imageexist['query']['pages']:
-            if (not x.get('known')) and x.get('missing'):
+            if (not x.get('known')) and x.get('missing'):#TODO:known seems to work well enough to know that it is a commons image but not documented. either find documentation or add an extra check to commmons?
                 brokenimages.add(x['title'])
         print(title, 'has the broken images:', brokenimages)
         current[title] = brokenimages
