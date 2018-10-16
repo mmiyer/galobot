@@ -83,7 +83,7 @@ try:
             print(presence)
             reduced = [x[0] for x in groupby(presence)] #basically remove consecutive duplicates - reduce 0,0,0,0,1,1,1,1 to 0,1
             print(reduced)
-            if reduced == [0,1] or reduced = [1,1]: #check if broken image is only inserted once, if not ignore
+            if reduced in([0,1], [1]): #check if broken image is only inserted once, if not ignore; needs to make sure when reduced = 1 that the first revision is actually that person adding the image - check the revision before
                 badrevdata = revisions[presence.index(1)] #find where insertion occured, and then what revision it was done in and who did it
                 user = badrevdata[0]
                 diffdata = (badrevdata[1], badrevdata[2], title, image)
@@ -109,5 +109,6 @@ for username in users:
         diffs = ''.join(difflist)
         print('Messaging', username, '...')
         print('Hello. Thank you for your recent edits. An automated process has found that you have added a link to ', 'the non-existent files:' if multiple else 'a non-existent file ', diffs,  '.' if not multiple else '\n', 'If you can, please remove or fix the file link. You may remove this message. To stop receiving these messages, see the opt-out instructions. ~~~~', sep = '')
+#Remember to when adding saving functionality to add shutoff
 #TODO:be more efficient when user makes multiple consecutive edits
 #TODO:deal with first page creations with broken links nicely
