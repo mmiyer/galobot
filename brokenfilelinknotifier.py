@@ -1,14 +1,8 @@
-#!/usr/bin/python3
-
 import shelve
 import os
 import datetime
 from itertools import groupby
-import pywikibot as p
-
-site = p.Site()
-site.login()
-if not site.logged_in(): print('Not logged in?'); sys.exit()
+from galobotbase import *
 
 categories = p.data.api.PageGenerator('categorymembers', gcmtitle = 'Category:Articles_with_missing_files', gcmnamespace = 0, site = site)
 categories.set_maximum_items(100)
@@ -29,7 +23,7 @@ with shelve.open('current run.shelve') as current,  shelve.open('previous run.sh
         current[title] = brokenimages
     print('Comparing previous and current')
     current = prev #temporary for testing
-    prev = {}#temporary for testing
+    #prev = {}#temporary for testing
     new = {}
     for key in current:
         prevvalue = prev.get(key)
@@ -42,7 +36,7 @@ with shelve.open('current run.shelve') as current,  shelve.open('previous run.sh
     print('Differences are:', new)
 
 #os.rename('current run.shelve', 'previous run.shelve')
-os.remove('current run.shelve')
+#os.remove('current run.shelve') #keep the same current and previous run for now
 
 with open('runlog', 'r') as runlog:
     prevtime = runlog.readlines()[-1]
@@ -50,12 +44,12 @@ with open('runlog', 'a+') as runlog:
     pass
     #runlog.write('\n'+datetime.datetime.utcnow().isoformat())
 
-try:
 users = {}
 try:
     for title in new:
         images = new[title]
         print('Grabbing revisions of', title)
+        #TODO:use pywikibot revisions functions
         revlist = p.data.api.PropertyGenerator(prop = 'revisions', rvstart = prevtime, rvprop = 'user|timestamp|ids', rvdir = 'newer', titles = title, site = site)
         revisions = []
         revdata = next(iter(revlist)).get('revisions')
@@ -78,14 +72,14 @@ try:
             imagerevrequest = p.data.api.Request(parameters = {'action' : 'parse', 'oldid' : revdata[2], 'prop' : 'images', 'format' : 'json', 'formatversion' : '2'}, site = site).submit()
             imagerev = imagerevrequest['parse']['images']
             for image in images:
-            imagepresences[image].append(1 if image[5:].replace(' ', '_') in imagerev else 0)
+                imagepresences[image].append(1 if image[5:].replace(' ', '_') in imagerev else 0)
         for image in imagepresences:
             print('Processing presence of', image)
             presence = imagepresences[image]
             print(presence)
             reduced = [x[0] for x in groupby(presence)] #basically remove consecutive duplicates - reduce 0,0,0,0,1,1,1,1 to 0,1
             print(reduced)
-            if reduced in([0,1], [1]): #check if broken image is only inserted once, if not ignore; needs to make sure when reduced = 1 that the first revision is actually that person adding the image - check the revision before
+            if reduced in([0,1], [1]): #check if broken image is only inserted once, if not ignore; needs to make sure when reduced = 1 that the first revision is actually that person adding the image - check the revision before; simple solution, grab one more revision in original call then can check if reduced == [0,1]
                 badrevdata = revisions[presence.index(1)] #find where insertion occured, and then what revision it was done in and who did it
                 user = badrevdata[0]
                 diffdata = (badrevdata[1], badrevdata[2], title, image)
@@ -99,6 +93,7 @@ except Exception as e:
 
 for username in users:
     print('Checking the rights of', username, '...')
+    #TODO:use pywikibot.page.User
     rights = next(iter(p.data.api.ListGenerator('users', ususers = username, usprop = 'rights', site = site))).get('rights')
     if rights and 'autoconfirmed' in rights:
         userdata = users[username]

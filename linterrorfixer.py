@@ -1,13 +1,5 @@
-#!/usr/bin/python3
-
-import sys
 import re
-import time
-import pywikibot as p
-
-site = p.Site()
-site.login()
-if not site.logged_in(): print("Not logged in?"); sys.exit()
+from galobotbase import *
 
 def main(queries):
     def fix(text, name, loc, shift):
@@ -46,6 +38,7 @@ def main(queries):
             continue
         if pageid in pageids: continue
         else: pageids.append(pageid)
+        print(title)
         errors = p.data.api.ListGenerator("linterrors", lntcategories = "multiple-unclosed-formatting-tags", lntlimit = 500, lntpageid = pageid, site = site)
         page = p.Page(site, title)
         text = page.text
@@ -67,20 +60,13 @@ def main(queries):
             newtext, shift, ef = fix(newtext, name, loc, shift)
             if ef == 0:
                 allerrorsfixed = False #ef = errorsfixed, if unable to fix a particular error, all errors haven't been fixed
+                print("Not fixed", error)
                 break
         if lintId !=0: ids.write("\n"+str(lintId))
         if allerrorsfixed:
             page.text = newtext
             try:
-                if p.Page(site, "User:Galobot/shutoff").text != "":
-                    print("Bot shutoffed")
-                    while 1:
-                        time.sleep(60)
-                        print("Checking shutoff...")
-                        if p.Page(site, "User:Galobot/shutoff").text == "":
-                            print("No longer shutoffed")
-                            break
-                page.save(summary = "[[User:Galobot#Task_1|Task 1]]: Fix [[Special:LintErrors|lint errors]] ([[Special:LintErrors/multiple-unclosed-formatting-tags|multiple unclosed formatting tags]])", minor = True) #edit page
+                page.savewithshutoff(summary = "[[User:Galobot#Task_1|Task 1]]: Fix [[Special:LintErrors|lint errors]] ([[Special:LintErrors/multiple-unclosed-formatting-tags|multiple unclosed formatting tags]])", minor = True) #edit page
             except p.exceptions.PageSaveRelatedError:
                 print("Error")
                 with open("errorsfile.txt", "a+") as errorsfile:
