@@ -2,7 +2,7 @@ import shelve
 import os
 import datetime
 from itertools import groupby
-from galobotbase import *
+from botbase import *
 
 categories = p.data.api.PageGenerator('categorymembers', gcmtitle = 'Category:Articles_with_missing_files', gcmnamespace = 0, site = site)
 categories.set_maximum_items(100)

@@ -1,5 +1,5 @@
 import re
-from galobotbase import *
+from botbase import *
 
 def main(queries):
     def fix(text, name, loc, shift):

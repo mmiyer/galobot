@@ -1,6 +1,6 @@
 import toolforge
 import pymysql
-from galobotbase import *
+from botbase import *
 
 conn = toolforge.connect('enwiki')
 
