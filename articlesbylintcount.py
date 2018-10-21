@@ -1,6 +1,5 @@
 import toolforge
 import pymysql
-import pickle
 from galobotbase import *
 
 conn = toolforge.connect('enwiki')
