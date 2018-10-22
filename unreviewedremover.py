@@ -17,10 +17,9 @@ for transclusion in transclusions:
     title = transclusion["title"]
     pageactions = []
     #let's get all the relevant log actions of reviewing and unreviewing
-    
-        pageactions.extend(logevent("patrol/patrol", title, 1))
-        pageactions.extend(logevent("pagetriage-curation/reviewed", title, 1))
-        pageactions.extend(logevent("pagetriage-curation/unreviewed", title, 0))
+    pageactions.extend(logevent("patrol/patrol", title, 1))
+    pageactions.extend(logevent("pagetriage-curation/reviewed", title, 1))
+    pageactions.extend(logevent("pagetriage-curation/unreviewed", title, 0))
     pageactions.sort(key = itemgetter(0))
     print(title, pageactions)
     if len(pageactions) > 0 and pageactions[-1][1] == 1:#latest action was a review, so let's remove the template
