@@ -22,21 +22,24 @@ for x in extract_stack():#trace the stack to get filename, which is the taskname
 
 print(taskname)
 
+def checkshutoff(shutoff):
+    shutofftitle = "User:Galobot/shutoff/" + shutoff
+    spage = p.Page(site, shutofftitle)
+    if spage.get() != "":
+        print("Bot shutoffed")
+        for x in range(1,10):
+            time.sleep(60)
+            print("Checking shutoff...")
+            if spage.get(force = True) == "":
+                print("No longer shutoffed")
+                break
+        else:
+            print("After checking 10 times still shutoffed, so ending process.")
+            sys.exit()
+    
 class Page (p.Page):
     def savewithshutoff (self, shutoff = taskname, **kwargs):
-        shutofftitle = "User:Galobot/shutoff/" + shutoff
-        spage = p.Page(site, shutofftitle)
-        if spage.get() != "":
-            print("Bot shutoffed")
-            for x in range(1,10):
-                time.sleep(60)
-                print("Checking shutoff...")
-                if spage.get(force = True) == "":
-                    print("No longer shutoffed")
-                    break
-            else:
-                print("After checking 10 times still shutoffed, so ending process.")
-                sys.exit()
+        checkshutoff(shutoff)
         self.save(**kwargs) #edit page
 
 p.Page = Page
