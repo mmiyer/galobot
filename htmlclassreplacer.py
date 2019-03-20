@@ -19,7 +19,6 @@ def node_filter(node):
 	return False
 
 for searchresult in searchresults:
-	print(searchresult)
 	title = searchresult["title"]
 	page = p.Page(site, title)
 	text = page.get()
