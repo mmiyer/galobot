@@ -24,8 +24,8 @@ for searchresult in searchresults:
 	page = p.Page(site, title)
 	text = page.get()
 	wikicode = mwparserfromhell.parse(text)
-	iterator = wikicode.ifilter_tags(matches = node_filter)
-	for node in iterator:
+	nodes = wikicode.ifilter_tags(matches = node_filter)
+	for node in nodes:
 		end = "" if node.contents.endswith("\n") else "\n"
 		new_markup = template_start + str(node.contents) + end +  template_end
 		wikicode.replace(node, new_markup)
