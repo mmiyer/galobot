@@ -24,7 +24,6 @@ print(taskname)
 
 def checkshutoff(shutoff):
     shutofftitle = "User:Galobot/shutoff/" + shutoff
-    print(shutofftitle)
     spage = p.Page(site, shutofftitle)
     if spage.get() != "":
         print("Bot shutoffed")
