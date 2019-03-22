@@ -1,20 +1,18 @@
 from botbase import *
 import mwparserfromhell
 
+tag = "div"
 htmlclass = "letterhead"
 template_start = "{{letterhead start}}"
 template_end = "{{letterhead end}}"
 searchquery = ("insource:\"{0}\" insource:/class *= *[\"'][a-zA-Z0-9 ]*{0}/").format(htmlclass)
 searchresults = p.data.api.ListGenerator("search", srsearch = searchquery, srnamespace = "*", srwhat = "text", srprop = "", site = site)
-n = 50
-searchresults.set_query_increment(n)
-searchresults.set_maximum_items(n)
 
 def node_filter(node):
 	attrs = node.attributes
 	if len(attrs) == 1:
 		attr = attrs[0]
-		if attr.name == "class" and attr.value.strip() == htmlclass:
+		if node.tag == tag and attr.name == "class" and attr.value.strip() == htmlclass:
 			return True
 	return False
 
@@ -28,4 +26,14 @@ for searchresult in searchresults:
 		end = "" if node.contents.endswith("\n") else "\n"
 		new_markup = template_start + str(node.contents) + end +  template_end
 		wikicode.replace(node, new_markup)
-	#page.savewithshutoff(str(wikicode))
+	new_text = str(wikicode)
+	if page.text != new_text:
+		page.text = new_text
+	else:
+		print('Could not save "{}"'.format(title))
+		continue
+	page.savewithshutoff(
+		summary = 'Replacing uses of "{}" class with template ([[Wikipedia:Bots/Requests for approval/Galobot 3|BRFA]])'.format(htmlclass),
+		minor = True,
+		max_edits = 25
+	)
