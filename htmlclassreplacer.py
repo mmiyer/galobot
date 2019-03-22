@@ -29,11 +29,11 @@ for searchresult in searchresults:
 	new_text = str(wikicode)
 	if page.text != new_text:
 		page.text = new_text
+		page.savewithshutoff(
+			summary = 'Replacing uses of "{}" class with template ([[Wikipedia:Bots/Requests for approval/Galobot 3|BRFA]])'.format(htmlclass),
+			minor = True,
+			force=True
+		)
 	else:
 		print('Could not save "{}"'.format(title))
 		continue
-	page.savewithshutoff(
-		summary = 'Replacing uses of "{}" class with template ([[Wikipedia:Bots/Requests for approval/Galobot 3|BRFA]])'.format(htmlclass),
-		minor = True,
-		max_edits = 25
-	)
