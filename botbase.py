@@ -24,6 +24,7 @@ print(taskname)
 
 def checkshutoff(shutoff):
     shutofftitle = "User:Galobot/shutoff/" + shutoff
+    print(shutofftitle)
     spage = p.Page(site, shutofftitle)
     if spage.get() != "":
         print("Bot shutoffed")
@@ -38,8 +39,25 @@ def checkshutoff(shutoff):
             sys.exit()
     
 class Page (p.Page):
-    def savewithshutoff (self, shutoff = taskname, **kwargs):
+    def savewithshutoff (self, shutoff = taskname, max_edits = False, dry = False, **kwargs):
         checkshutoff(shutoff)
-        self.save(**kwargs) #edit page
+        if max_edits:
+            editfilename = shutoff+".txt"
+            try:
+                with open(editfilename, "r+") as editfile:
+                    text = editfile.read()
+                    edit_count = int(text)
+                    if edit_count >= max_edits:
+                        sys.exit("Exiting {} as completed {} edits.".format(taskname, max_edits))
+                    else:
+                        editfile.seek(0)
+                        editfile.write(str(edit_count + 1))
+            except FileNotFoundError:
+                with open(editfilename, "w") as editfilew:
+                    editfilew.write("0")
+        if dry:
+            print('Page "{}" saved'.format(self.title()))
+        else:
+            self.save(**kwargs) #edit page
 
 p.Page = Page
