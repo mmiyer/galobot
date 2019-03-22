@@ -55,7 +55,7 @@ class Page (p.Page):
                 with open(editfilename, "w") as editfilew:
                     editfilew.write("0")
         if dry:
-            print('Page "{}" saved'.format(self.title()))
+            print('Page "{}" saved (dry run)'.format(self.title()))
         else:
             self.save(**kwargs) #edit page
 
