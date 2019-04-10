@@ -3,10 +3,18 @@ import pymysql
 from botbase import *
 
 conn = toolforge.connect('enwiki', cluster = 'analytics' )
+query = '''
+select page_title, count(*) from linter
+join page on page.page_id = linter.linter_page
+where page.page_namespace=0 and linter_cat != 2
+group by page.page_id
+order by count(*) desc, page_title asc
+limit 1000;
+'''
 
 tablerows = []
 with conn.cursor(pymysql.cursors.DictCursor) as cur:
-    cur.execute("select page_title, count(*) from linter join page on page.page_id = linter.linter_page where page.page_namespace=0 and linter_cat !=2 group by page.page_id order by count(*) desc limit 1000;")
+    cur.execute(query)
     data = cur.fetchall()
     for row in data:
         tablerows.append('\n|-\n| [[' + row['page_title'].decode().replace('_', ' ') + ']]\n|' + str(row['count(*)']))
