@@ -1,12 +1,21 @@
+'''
+Parts from https://en.wikipedia.org/wiki/User:Ritchie333/afcbios.py, licensed CC-BY-SA-3.0
+'''
+
+import re
 from botbase import *
 
 titles = []
-page_to_update = "Wikipedia:WikiProject Women in Red/Drafts"
-wikitext = "{{{0}/Header}}".format(page_to_update)
-wikitext_header_2 = "== {0} ==\n"
-wikitext_header_3 = "== {0} - {1} ===\n"
-wikitext_entry = "* [[{0}]]\n::<small>{1} - {2}</small>\n:::<small><nowiki>{4}</nowiki></small>\n"
-search_query = 'incategory:"AfC submissions declined as a non-notable biography" "%s"' 
+page_to_update = "User:Galobtter/sandbox"
+reMarker = re.compile("<ref.*\/ref>|{{.*}}|<!--.*-->|\'\'\'|----")
+reTitle = re.compile( '\(.*\)' )
+header_new = "New Additions"
+header_old = "Existing Pages"
+wikitext = "{{/Header}}\n"
+wikitext_header_2 = "== {} ==\n"
+wikitext_header_3 = "=== {} - {} ===\n"
+wikitext_entry = "* [[{}]]\n::<small><nowiki>{}</nowiki></small>\n:::<small><nowiki>{} - {}</nowiki></small>\n"
+search_query = 'incategory:"AfC submissions declined as a non-notable biography" "{}"' 
 keywords = [ "she was", "she is", "her book", "her work" ]
 
 def run_search(keyword):
@@ -15,43 +24,45 @@ def run_search(keyword):
 		srnamespace = 118,
 		srsearch = search_query.format(keyword),
 		srprop = "",
-		srlimit = 5,
 		site = site
 	)
-	page_query.set_maximum_items(5)
-	print([page_result["title"] for page_result in page_query])
+	return [page_result["title"] for page_result in page_query]
 
 def generate_entries(titles, header):
 	section_wikitext = wikitext_header_2.format(header)
-        for num, title in enumerate(titles):
+	for num, title in enumerate(titles):
 		if num % 50 == 0:
 			section_wikitext += wikitext_header_3.format(num + 1, num + 50)
-                page = p.Page(title)
-                timestamp = page.latest_revision["timestamp"]
-                editsummary = page.latest_revision["comment"]
-                firstsentence = next(iter(p.data.api.PropGenerator(
-                        "extracts",
-                        exsentences = 1,
-                        titles = title,
-                        site = site
-                )))     
-                page_data = [title, timestamp, editsummary, firstsentence]
-                section_wikitext += wikitext_entry.format(page_data)
+		page = p.Page(site, title)
+		timestamp = str(page.latest_revision["timestamp"])[0:10]
+		editsummary = page.latest_revision["comment"]
+		shortText = reMarker.sub( '', page.text )
+		shortTitle = reTitle.sub( '', title[6:] )
+		sentences = re.search( shortTitle + '.*\.', shortText )
+		if sentences is not None:
+			firstsentence = sentences.group().partition( '.' )[0]
+		else:
+			firstsentence = ""
+		section_wikitext += wikitext_entry.format(
+			title, firstsentence, timestamp, editsummary
+		)
+	return section_wikitext
 
 for keyword in keywords:
 	titles += run_search(keyword)
 
 titles = set(titles)
 
-with open('last_titles.txt', 'r+') as last_titles_file:
-	last_titles = set(last_titles_file.read_lines().split("|"))
-	last_titles_file.seek(0)
+with open('last_titles.txt', 'r') as last_titles_file:
+	last_titles = set(last_titles_file.read().split("|"))
+with open('last_titles.txt', 'w') as last_titles_file:
 	last_titles_file.write("|".join(titles))
 	
 new_titles = titles - last_titles
 old_titles = titles & last_titles
 
-wikitext = generate_entries
-print(wikitext)
+wikitext += generate_entries(new_titles, header_new) + generate_entries(old_titles, header_old)
 
-p.Page(site, page_to_update)
+page = p.Page(site, page_to_update)
+page.text = wikitext
+page.savewithshutoff(summary = 'Update "Women in Red drafts" report', minor = False)
