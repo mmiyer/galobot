@@ -6,7 +6,7 @@ import re
 from botbase import *
 
 titles = []
-page_to_update = "User:Galobtter/sandbox"
+page_to_update = "Wikipedia:WikiProject Women in Red/Drafts"
 reMarker = re.compile("<ref.*\/ref>|{{.*}}|<!--.*-->|\'\'\'|----")
 reTitle = re.compile( '\(.*\)' )
 header_new = "New Additions"
@@ -61,7 +61,7 @@ with open('last_titles.txt', 'w') as last_titles_file:
 new_titles = titles - last_titles
 old_titles = titles & last_titles
 
-wikitext += generate_entries(new_titles, header_new) + generate_entries(old_titles, header_old)
+wikitext += (generate_entries(new_titles, header_new) + generate_entries(old_titles, header_old))
 
 page = p.Page(site, page_to_update)
 page.text = wikitext
