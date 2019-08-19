@@ -38,10 +38,11 @@ def checkshutoff(shutoff):
             sys.exit()
     
 class Page (p.Page):
-    def savewithshutoff (self, shutoff = taskname, max_edits = False, dry = False, **kwargs):
+    def savewithshutoff (self, shutoff = taskname, max_edits = False, dry = False, summary = "", **kwargs):
         checkshutoff(shutoff)
+        kwargs["summary"] = summary + " ([[User:Galobot/shutoff/{}|shutoff]])".format(shutoff)
         if max_edits:
-            editfilename = shutoff+".txt"
+            editfilename = taskname+".txt"
             try:
                 with open(editfilename, "r+") as editfile:
                     text = editfile.read()
