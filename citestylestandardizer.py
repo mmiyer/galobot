@@ -58,6 +58,7 @@ def change_template(node, new_name):
 
 for transclusion in transclusions:
     title = transclusion["title"]
+    print("\n" + title)
     page = p.Page(site, title)
     text = page.get()
     wikicode = mwparserfromhell.parse(text)
@@ -71,8 +72,8 @@ for transclusion in transclusions:
     )
     if 1 <= len(cs2_templates) <= 3 and len(cs1_templates) / len(cs2_templates) >= 5:
         for cs2_template in cs2_templates:
-            cs2_template.has(param, ignore_empty=True)
-            new_template = change_template(cs2_template, "Cite book")
-            print(new_template)
+            print(cs2_template)
+            # cs2_template.has(param, ignore_empty=True)
+            # new_template = change_template(cs2_template, "Cite book")
+            # print(new_template)
             # wikicode.replace(cs2_template, new_template)
-        break
