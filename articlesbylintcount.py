@@ -4,7 +4,16 @@ from botbase import *
 
 conn = toolforge.connect('enwiki', cluster = 'analytics' )
 query = '''
-select page_title, count(*) from linter
+select page_title
+, count(*) as page_count
+, sum(case when linter_params like '%"name":"center"%' then 1 end) as tag_center
+, sum(case when linter_params like '%"name":"small"%' then 1 end) as tag_small
+, sum(case when linter_params like '%"name":"span"%' then 1 end) as tag_span
+, sum(case when linter_params like '%"name":"div"%' then 1 end) as tag_div
+, sum(case when linter_params like '%"name":"b"%' then 1 end) as tag_b
+, sum(case when linter_params like '%"name":"i"%' then 1 end) as tag_i
+, sum(case when linter_params like '%"name":"s"%' then 1 end) as tag_s
+from linter
 join page on page.page_id = linter.linter_page
 where page.page_namespace=0 and linter_cat != 2
 group by page.page_id
