@@ -15,14 +15,15 @@ wikitext = "{{/Header}}\n"
 wikitext_header_2 = "== {} ==\n"
 wikitext_header_3 = "=== {} - {} ===\n"
 wikitext_entry = "* [[{}]]\n::<small><nowiki>{}</nowiki></small>\n:::<small><nowiki>{} - {}</nowiki></small>\n"
-search_query = 'incategory:"AfC submissions declined as a non-notable biography" "{}"' 
+search_query = 'incategory:"{}" "{}"' 
+categories = [ "AfC submissions declined as a non-notable biography", "AfC submissions declined as a non-notable academic topic" ]
 keywords = [ "she was", "she is", "her book", "her work" ]
 
-def run_search(keyword):
+def run_search(category, keyword):
 	page_query = p.data.api.ListGenerator(
 		"search",
 		srnamespace = 118,
-		srsearch = search_query.format(keyword),
+		srsearch = search_query.format(category, keyword),
 		srprop = "",
 		site = site
 	)
@@ -48,8 +49,9 @@ def generate_entries(titles, header):
 		)
 	return section_wikitext
 
-for keyword in keywords:
-	titles += run_search(keyword)
+for category in categories:
+	for keyword in keywords:
+		titles += run_search(category, keyword)
 
 titles = set(titles)
 
