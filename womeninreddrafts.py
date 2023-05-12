@@ -39,7 +39,7 @@ def generate_entries(titles, header):
 		editsummary = page.latest_revision["comment"]
 		shortText = reMarker.sub( '', page.text )
 		shortTitle = reTitle.sub( '', title[6:] )
-		sentences = re.search( shortTitle + '.*\.', shortText )
+		sentences = re.search( re.escape(shortTitle) + '.*\.', shortText )
 		if sentences is not None:
 			firstsentence = sentences.group().partition( '.' )[0]
 		else:
